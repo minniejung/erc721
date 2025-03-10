@@ -12,7 +12,7 @@ import {
 } from '../web3/ethers';
 import { ethers as hre } from 'hardhat';
 
-describe('Erc20 기능 Web3.js 검사', function () {
+describe('Erc721 기능 Ethers.js 검사', function () {
   const tokenURI = 'https://example.com/metadata/0';
   const wallet = getSigner();
   let recipient: any;
