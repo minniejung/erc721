@@ -17,7 +17,7 @@ describe('Deploy 검사', function () {
     try {
       mytoken = await MytokenFactory.deploy('MyNFT', 'MNFT');
     } catch (error) {
-      mytoken = await MytokenFactory.deploy();
+      mytoken = await (MytokenFactory as any).deploy();
     }
 
     await mytoken.waitForDeployment();
