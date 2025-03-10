@@ -18,10 +18,14 @@ describe('Erc721 기능 Ethers.js 검사', function () {
   let recipient: any;
 
   before(async function () {
-    const signers = await hre.getSigners();
-    recipient = signers.filter(
-      (signer) => signer.address !== wallet.address
-    )[0];
+    try {
+      const signers = await hre.getSigners();
+      recipient = signers.filter(
+        (signer) => signer.address !== wallet.address
+      )[0];
+    } catch (err) {
+      throw new Error('Todo: getSigner 함수를 구현해야 합니다.');
+    }
   });
 
   describe('환경 셋팅 검사', function () {
@@ -71,53 +75,44 @@ describe('Erc721 기능 Ethers.js 검사', function () {
     });
 
     it('safeTransferFrom는 컨트랙트의 safeTransferFrom함수를 사용하여 from이 to에게 tokenId에 해당하는 토큰을 전송해야 합니다.', async function () {
-      const balance = Number(await balanceOf(wallet.address));
-      let receipt: any;
+      this.retries(3);
 
-      for (let i = 1; i <= balance; i++) {
-        try {
-          const transfer = await safeTransferFrom(
-            wallet.address,
-            recipient.address,
-            i
-          );
-          receipt = await transfer.wait();
+      const mintNFT = await mint(wallet.address, tokenURI);
+      const receipt1 = await mintNFT.wait();
 
-          if (receipt.status === 1) {
-            break;
-          }
-        } catch (error) {
-          continue;
-        }
-      }
-
-      const transferEvent = receipt.logs.find(
+      const transferEvent1 = receipt1.logs.find(
         (log: any) => log.fragment?.name === 'Transfer'
       );
-      const tokenId = Number(transferEvent.args.tokenId);
+
+      const tokenId = Number(transferEvent1.args.tokenId);
+
+      const transfer = await safeTransferFrom(
+        wallet.address,
+        recipient.address,
+        tokenId
+      );
+      await transfer.wait();
+
       const owner = await ownerOf(tokenId);
       expect(owner.toLowerCase()).to.equal(recipient.address.toLowerCase());
     });
 
     it('approve는 컨트랙트의 approve 함수를 사용하여 from이 to에게 tokenId에 해당하는 토큰을 승인해야 합니다.', async function () {
-      const balance = Number(await balanceOf(wallet.address));
-      let receipt: any;
-      let tokenId: number | null = null;
+      this.retries(3);
+
       let spender: string;
 
-      for (let i = 1; i <= balance; i++) {
-        try {
-          const approved = await approve(recipient.address, i);
-          receipt = await approved.wait();
+      const mintNFT = await mint(wallet.address, tokenURI);
+      const receipt = await mintNFT.wait();
 
-          if (receipt.status === 1) {
-            tokenId = i;
-            break;
-          }
-        } catch (error) {
-          continue;
-        }
-      }
+      const transferEvent = receipt.logs.find(
+        (log: any) => log.fragment?.name === 'Transfer'
+      );
+
+      const tokenId = Number(transferEvent.args.tokenId);
+
+      const approved = await approve(recipient.address, tokenId);
+      await approved.wait();
 
       if (tokenId !== null) {
         const contract = getContract();
