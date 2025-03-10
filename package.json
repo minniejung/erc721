@@ -1,0 +1,19 @@
+{
+  "name": "hardhat-project",
+  "scripts": {
+    "deploy": "npx hardhat run scripts/deploy.ts --network ganache",
+    "test:deploy": "npx hardhat test test/deploy.test.ts",
+    "test:ethers": "npx hardhat test test/ethers.test.ts"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.19",
+    "prettier": "^3.5.2",
+    "prettier-plugin-solidity": "^1.4.2"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.2.0",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.5"
+  }
+}
