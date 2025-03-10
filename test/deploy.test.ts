@@ -88,5 +88,26 @@ describe('Deploy 검사', function () {
       expect(tokenName.length).to.be.greaterThan(0);
       expect(tokenSymbol.length).to.be.greaterThan(0);
     });
+
+    it('MyNFT 컨트랙트는 NFT를 민팅해줄 수 있는 mint 함수가 있어야 합니다. - mint 함수는 인자(address(recipient), string(_tokenURI))를 이용하여 구현합니다.', async function () {
+      const tokenURI = 'https://example.com/metadata/0';
+      const mint = await mytoken.mint(owner.address, tokenURI);
+      const receipt = await mint.wait();
+
+      expect(receipt.status).to.equal(1);
+
+      expect(receipt.logs.length).to.be.greaterThan(0);
+      expect(receipt.to).to.equal(mytoken.target);
+      expect(receipt.from).to.equal(owner.address);
+      expect(receipt.blockNumber).to.be.a('number');
+      expect(receipt.blockHash).to.be.a('string');
+      expect(receipt.gasUsed).to.be.greaterThan(0);
+
+      const tokenId = await mytoken.balanceOf(owner.address);
+      expect(Number(tokenId)).to.be.greaterThan(0);
+
+      const storedTokenURI = await mytoken.tokenURI(tokenId);
+      expect(storedTokenURI).to.equal(tokenURI);
+    });
   });
 });
