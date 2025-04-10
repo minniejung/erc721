@@ -1,7 +1,7 @@
 {
   "name": "hardhat-project",
   "scripts": {
-    "deploy": "npx hardhat run scripts/deploy.ts --network ganache",
+    "deploy": "npx hardhat run scripts/deploy.ts --network kaia",
     "test:deploy": "npx hardhat test test/deploy.test.ts",
     "test:ethers": "npx hardhat test test/ethers.test.ts"
   },
